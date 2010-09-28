@@ -111,29 +111,29 @@ module Rightstuff
   class Client
 
     def initialize( options = {} )
-      @base_url = 'https://my.rightscale.com/api/acct'
       @username = options[ :username ] or raise 'no username supplied'
       @password = options[ :password ] or raise 'no password supplied'
       @account  = options[ :account ]  or raise 'no account id supplied'
       @account = @account.to_s
+
+      @base_url               = 'https://my.rightscale.com/api/acct'
+      url                     = URI.parse( @base_url )
+      @connection             = Net::HTTP.new( url.host, url.port )
+      @connection.use_ssl     = true
+      @connection.verify_mode = OpenSSL::SSL::VERIFY_NONE
     end
 
     def get_rest( rest )
       get( account_url( rest ) )
     end
 
-    def get( path )
-      address         = path
-      url             = URI.parse( address )
-      con             = Net::HTTP.new( url.host, url.port )
-      con.use_ssl     = true
-      con.verify_mode = OpenSSL::SSL::VERIFY_NONE
-
-      request         = Net::HTTP::Get.new( url.request_uri )
+    def get( address )
+      url     = URI.parse( address )
+      request = Net::HTTP::Get.new( url.request_uri )
       request.add_field( 'X-API-VERSION', '1.0' )
       request.basic_auth @username, @password
 
-      response = con.request( request )
+      response = @connection.request( request )
 
       case response.code
       when '200'
@@ -144,8 +144,9 @@ module Rightstuff
     end
 
     def servers
+      return @servers if @servers
       body = Nokogiri::XML( get_rest( 'servers' ) )
-      Server.load_collection( self, body )
+      @servers = Server.load_collection( self, body )
     end
 
     def account_url( rest )
