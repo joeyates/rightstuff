@@ -39,4 +39,4 @@ It should be of the form:
 = TODO
 
 * Cache connections
-* Don't query inactive serevrs for settings
+

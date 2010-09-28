@@ -1,5 +1,3 @@
-#!ruby
-
 require 'rubygems' if RUBY_VERSION < '1.9'
 require 'yaml'
 require 'net/https'
@@ -11,7 +9,7 @@ module Rightstuff
   module VERSION #:nodoc:
     MAJOR = 0
     MINOR = 0
-    TINY  = 1
+    TINY  = 2
  
     STRING = [ MAJOR, MINOR, TINY ].join('.')
   end
@@ -51,10 +49,10 @@ module Rightstuff
         node.class == Nokogiri::XML::Element ? node : nil
       end
       elements.compact!
-      elements.reduce({}) do | memo, element |
+      elements.reduce( {} ) do | memo, element |
         name = element.name
         name.gsub!( /-/, '_' )
-        memo[ name.intern ] = element.children[0].to_s
+        memo[ name.intern ] = element.children[ 0 ].to_s
         memo
       end
     end
@@ -73,7 +71,8 @@ module Rightstuff
   class Server < Base
     
     def initialize( client, item )
-      @settings = false
+      @settings = nil
+      @inputs   = nil
       super
     end
 
@@ -84,6 +83,7 @@ module Rightstuff
     def method_missing( name , *args, &block )
       result = super
       return result unless result.nil?
+      return nil    unless @attributes[ :state ] == 'operational'
       settings unless @settings
       return @attributes[ name ]
     end
@@ -93,15 +93,17 @@ module Rightstuff
     end
 
     def inputs
+      return @inputs if @inputs
       # Add inputs to instance data
       # @client.get( @attributes[ 'href' ] )
     end
 
     def settings
-      doc = @client.get_rest( 'servers/' + id + '/settings' )
-      xml = Nokogiri::XML( doc )
-      @attributes.merge!( Base.extract_attributes( xml.children ) )
-      @settings = true
+      return @settings if @settings
+      doc      = @client.get_rest( 'servers/' + id + '/settings' )
+      xml      = Nokogiri::XML( doc )
+      @settings = Base.extract_attributes( xml.children )
+      @attributes.merge!( settings )
     end
 
   end
