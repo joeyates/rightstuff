@@ -29,8 +29,7 @@ spec = Gem::Specification.new do |s|
   s.has_rdoc         = true
   s.rdoc_options     += RDOC_OPTS
   s.extra_rdoc_files = RDOC_FILES
-
-  s.test_files       = SPEC_FILES
+  s.rubyforge_project = 'nowarning'
 end
 
 Rake::GemPackageTask.new( spec ) do |pkg|
