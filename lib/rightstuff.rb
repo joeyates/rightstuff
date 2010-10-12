@@ -109,10 +109,10 @@ module Rightstuff
 
     def settings
       return @settings if @settings
-      doc      = @client.get_rest( 'servers/' + id + '/settings' )
-      xml      = Nokogiri::XML( doc )
+      doc       = @client.get_rest( 'servers/' + id + '/settings' )
+      xml       = Nokogiri::XML( doc )
       @settings = Base.extract_attributes( xml.children )
-      @attributes.merge!( settings )
+      @attributes.merge!( @settings )
     end
 
   end
@@ -136,11 +136,19 @@ module Rightstuff
       get( account_url( rest ) )
     end
 
+    def servers
+      return @servers if @servers
+      body     = Nokogiri::XML( get_rest( 'servers' ) )
+      @servers = Server.load_collection( self, body )
+    end
+
+    private
+
     def get( address )
       url     = URI.parse( address )
       request = Net::HTTP::Get.new( url.request_uri )
       request.add_field( 'X-API-VERSION', '1.0' )
-      request.basic_auth @username, @password
+      request.basic_auth( @username, @password )
 
       response = @connection.request( request )
 
@@ -150,12 +158,6 @@ module Rightstuff
       else
         raise "Request '#{ address }' failed with response code #{ response.code }\n#{ response.body }"
       end
-    end
-
-    def servers
-      return @servers if @servers
-      body     = Nokogiri::XML( get_rest( 'servers' ) )
-      @servers = Server.load_collection( self, body )
     end
 
     def account_url( rest )
