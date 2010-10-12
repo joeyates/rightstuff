@@ -14,7 +14,21 @@ module Rightstuff
     STRING = [ MAJOR, MINOR, TINY ].join('.')
   end
 
+  # Rightstuff::Credentials imposes no restrictions on the structure of the data
+  # It only requires that:
+  # 1. the user has a file called ~/.credentials,
+  # 2. the the file does not have any permissions for other users,
+  # 3. the file contails YAML::load-able data.
   module Credentials
+
+    def rightscale_data
+      return @rightscale_data if @rightscale_data
+      raise "Missing credentials file '#{ rightscale_data_path }'" if ! File.exist?( rightscale_data_path )
+      check_permissions
+      @rightscale_data = YAML.load_file( rightscale_data_path )
+    end
+
+    private
 
     def rightscale_data_path
       File.expand_path( '~/.rightstuff' )
@@ -25,13 +39,6 @@ module Rightstuff
       if mode & 0066 != 0
         raise "Permissions on '#{ rightscale_data_path }' too open (currently 0%o), should be 0600" % ( mode & 0666 )
       end
-    end
-
-    def rightscale_data
-      return @rightscale_data if @rightscale_data
-      raise "Missing credentials file '#{ rightscale_data_path }'" if ! File.exist?( rightscale_data_path )
-      check_permissions
-      @rightscale_data = YAML.load_file( rightscale_data_path )
     end
 
   end
@@ -69,7 +76,9 @@ module Rightstuff
   end
 
   class Server < Base
-    
+
+    attr_reader :attributes
+
     def initialize( client, item )
       @settings = nil
       @inputs   = nil
