@@ -11,7 +11,7 @@ module Rightstuff
       @username = options[ :username ] or raise 'no username supplied'
       @password = options[ :password ] or raise 'no password supplied'
       @account  = options[ :account ]  or raise 'no account id supplied'
-      @account = @account.to_s
+      @account  = @account.to_s
 
       @base_url               = 'https://my.rightscale.com/api/acct'
       url                     = URI.parse( @base_url )
@@ -27,7 +27,7 @@ module Rightstuff
     def servers
       return @servers if @servers
       body     = Nokogiri::XML( get_rest( 'servers' ) )
-      @servers = Server.load_collection( self, body )
+      @servers = Rightstuff::Server.load_collection( self, body )
     end
 
     private

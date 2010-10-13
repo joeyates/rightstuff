@@ -1,6 +1,7 @@
-require 'rightstuff/base'
-require 'rightstuff/client'
 require 'rightstuff/credentials'
+require 'rightstuff/client'
+require 'rightstuff/base'
+require 'rightstuff/server'
 
 module Rightstuff
 
