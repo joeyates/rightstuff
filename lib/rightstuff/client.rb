@@ -30,6 +30,12 @@ module Rightstuff
       @servers = Rightstuff::Server.load_collection( self, body )
     end
 
+    def server_arrays
+      return @server_arrays if @server_arrays
+      body     = Nokogiri::XML( get_rest( 'server_arrays' ) )
+      @server_arrays = Rightstuff::ServerArray.load_collection( self, body )
+    end
+
     private
 
     def get( address )

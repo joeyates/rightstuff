@@ -11,10 +11,17 @@ Here is a typical example:
  servers = rs.servers
  servers.each{ |server| puts server.private_ip_address }
 
+ server_arrays = rs.server_arrays
+ servers.each{ |array| puts("Array #{array.nickname} is running #{array.active_instances_count || 0} instances.") }
+
+ active_array = server_arrays.detect{|array| array.active_instances_count.to_i > 0}
+ array_instances = active_array.instances
+ puts("Array #{active_array.nickname}'s private IP address[es]: #{array_instances.map(&:private_ip_address) * ', '}")
+
 Rightstuff::Credentials assumes you have a YAMl file called ~/.rightstuff
 It should be of the form:
- --- 
- :main: 
+ ---
+ :main:
    :credentials:
      :username: myusername
      :password: mypass
