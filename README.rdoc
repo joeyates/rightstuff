@@ -43,6 +43,11 @@ It should be of the form:
 * http://github.com/rightscale/right_aws
 * http://github.com/moneypools/right_api
 
+= Contributors
+
+* joeyates
+* kwerle
+
 = TODO
 
 * Cache connections
