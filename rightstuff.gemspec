@@ -1,6 +1,6 @@
 lib = File.expand_path('../lib/', __FILE__)
 $:.unshift lib unless $:.include?(lib)
- 
+
 require 'rightstuff'
 
 ADMIN_FILES          = [ 'COPYING', 'Rakefile', 'README.rdoc' ]
