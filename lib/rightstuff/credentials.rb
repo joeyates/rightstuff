@@ -4,7 +4,7 @@ module Rightstuff
 
   # Rightstuff::Credentials imposes no restrictions on the structure of the data
   # It only requires that:
-  #  1. the user has a file called ~/.credentials,
+  #  1. the user has a file called ~/.rightstuff,
   #  2. the file contains YAML::load-able data.
   #  3. the the file does not have any permissions for other users,
   module Credentials
