@@ -7,14 +7,53 @@ LIB_PATH  = File.join( ROOT_PATH, 'lib' )
 $:.unshift( LIB_PATH )
 require 'rightstuff'
 
+include Rightstuff::Credentials
+
 options = {
-  :credentials_subkey => nil
+  :credentials_subkey => nil,
+  :show_all           => false
 }
 
 OptionParser.new do | opts |
-  opts.banner = "Usage: #{ $0 } [options]"
+  opts.banner = "Usage: #{ $0 } [options] ACTION"
 
-  opts.on( "-k", "--credentials-subkey SUBKEY", "The subkey of the ~/.rightstuff file to use for authentication" ) do
-    options[ :credentials_subkey ] = true
+  opts.on( "-a", "--all", "Show all items, not only active ones" ) do | subkey |
+    options[ :credentials_subkey ] = subkey.intern
+  end
+
+  opts.on( "-k", "--credentials-subkey=SUBKEY", "The subkey of the ~/.rightstuff file to use for authentication" ) do | subkey |
+    options[ :credentials_subkey ] = subkey.intern
   end
 end.parse!
+
+def extract_credentials( subkey )
+  data = rightscale_data
+  key = if subkey
+          unless data.has_key?( subkey )
+            raise "Your credentials file does not have a subkey '#{ subkey }'"
+          end
+          data[ subkey ]
+        else
+          data
+        end
+  unless key.has_key?( :credentials )
+    raise "No :credentials data found in your ~/.rightstuff file"
+  end
+  key[ :credentials ]
+end
+
+credentials = extract_credentials( options[ :credentials_subkey ] )
+client      = Rightstuff::Client.new( credentials )
+
+action      = ARGV.pop
+
+case action
+when 'servers'
+  puts client.servers.inspect
+when 'arrays'
+  puts client.arrays.inspect
+when nil
+  raise 'No action supplied'
+else
+  raise "Unknown action '#{ ARGV[ 0 ] }'"
+end
