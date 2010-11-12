@@ -10,19 +10,8 @@ module Rightstuff
       super
     end
 
-    def self.collection_xpath
-      '/server-arrays/server-array'
-    end
-
-    def method_missing( name , *args, &block )
-      result = super
-      return result unless result.nil?
-      return nil    if @attributes[ :state ] == 'stopped'
-      return @attributes[ name ]
-    end
-
-    def id
-      @attributes[ :href ].split( '/' ).last
+    def active?
+      @attributes[ :state ] != 'stopped'
     end
 
     def inputs
@@ -33,7 +22,7 @@ module Rightstuff
 
     def instances
       return @instances if @instances
-      body     = Nokogiri::XML( @client.get_rest( "server_arrays/#{id}/instances" ) )
+      body     = Nokogiri::XML( @client.get_rest( "#{ type.pluralize }/#{ id }/instances" ) )
       @instances = Rightstuff::ArrayInstance.load_collection( @client, body )
     end
   end

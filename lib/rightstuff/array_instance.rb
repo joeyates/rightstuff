@@ -9,19 +9,8 @@ module Rightstuff
       super
     end
 
-    def self.collection_xpath
-      '/instances/instance'
-    end
-
-    def method_missing( name , *args, &block )
-      result = super
-      return result unless result.nil?
-      return nil    if @attributes[ :state ] == 'stopped'
-      return @attributes[ name ]
-    end
-
-    def id
-      @attributes[ :href ].split( '/' ).last
+    def active?
+      @attributes[ :state ] != 'stopped'
     end
 
     def inputs

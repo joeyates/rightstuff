@@ -28,6 +28,7 @@ Gem::Specification.new do |s|
   s.executables      += EXECUTABLE_FILENAMES
   s.require_paths    = [ 'lib' ]
   s.add_dependency( 'nokogiri', '>= 1.4.3.1' )
+  s.add_dependency( 'activesupport', '>= 2.3.2' )
 
   s.has_rdoc         = true
   s.rdoc_options     += RDOC_OPTS

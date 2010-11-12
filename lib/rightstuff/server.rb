@@ -1,5 +1,5 @@
 module Rightstuff
-
+  # http://support.rightscale.com/15-References/RightScale_API_Reference_Guide/02-Management/02-Servers
   class Server < Base
 
     attr_reader :attributes
@@ -10,20 +10,8 @@ module Rightstuff
       super
     end
 
-    def self.collection_xpath
-      '/servers/server'
-    end
-
-    def method_missing( name , *args, &block )
-      result = super
-      return result unless result.nil?
-      return nil    unless @attributes[ :state ] == 'operational'
-      settings unless @settings
-      return @attributes[ name ]
-    end
-
-    def id
-      @attributes[ :href ].split( '/' ).last
+    def active?
+      @attributes[ :state ] == 'operational'
     end
 
     def inputs
@@ -34,7 +22,7 @@ module Rightstuff
 
     def settings
       return @settings if @settings
-      doc       = @client.get_rest( 'servers/' + id + '/settings' )
+      doc       = @client.get_rest( "#{ type.pluralize }/#{ id }/settings" )
       xml       = Nokogiri::XML( doc )
       @settings = Base.extract_attributes( xml.children )
       @attributes.merge!( @settings )

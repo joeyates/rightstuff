@@ -1,9 +1,18 @@
 require 'rubygems' if RUBY_VERSION < '1.9'
+require 'active_support/all'
 require 'nokogiri'
 
 module Rightstuff
 
   class Base
+
+    def self.type
+      name.demodulize.underscore
+    end
+
+    def self.collection_xpath
+      "/#{ type.pluralize }/#{ type }"
+    end
 
     def self.load_collection( client, doc )
       doc.xpath( self.collection_xpath ).collect do | item |
@@ -29,6 +38,17 @@ module Rightstuff
     def initialize( client, item )
       @client     = client
       @attributes = Base.extract_attributes( item )
+    end
+
+    def id
+      @attributes[ :href ].split( '/' ).last
+    end
+
+    def method_missing( name , *args, &block )
+      result = super
+      return result unless result.nil?
+      return nil    if ! active?
+      return @attributes[ name ]
     end
 
     def method_missing( name, *args, &block )
