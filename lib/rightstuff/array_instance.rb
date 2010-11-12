@@ -2,8 +2,6 @@ module Rightstuff
   # http://support.rightscale.com/15-References/RightScale_API_Reference_Guide/02-Management/09-Server_Arrays
   class ArrayInstance < Base
 
-    attr_reader :attributes
-
     def initialize( client, item )
       @inputs   = nil
       super
