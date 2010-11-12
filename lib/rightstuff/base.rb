@@ -24,6 +24,8 @@ module Rightstuff
       end
     end
 
+    attr_reader :attributes
+
     def initialize( client, item )
       @client     = client
       @attributes = Base.extract_attributes( item )

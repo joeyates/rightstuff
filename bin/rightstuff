@@ -11,14 +11,14 @@ include Rightstuff::Credentials
 
 options = {
   :credentials_subkey => nil,
-  :show_all           => false
+  :all                => false
 }
 
 OptionParser.new do | opts |
   opts.banner = "Usage: #{ $0 } [options] ACTION"
 
-  opts.on( "-a", "--all", "Show all items, not only active ones" ) do | subkey |
-    options[ :credentials_subkey ] = subkey.intern
+  opts.on( "-a", "--all", "Include all items" ) do | subkey |
+    options[ :all ] = true
   end
 
   opts.on( "-k", "--credentials-subkey=SUBKEY", "The subkey of the ~/.rightstuff file to use for authentication" ) do | subkey |
@@ -44,14 +44,16 @@ end
 
 credentials = extract_credentials( options[ :credentials_subkey ] )
 client      = Rightstuff::Client.new( credentials )
-
 action      = ARGV.pop
 
 case action
 when 'servers'
-  puts client.servers.inspect
-when 'arrays'
-  puts client.arrays.inspect
+  servers = client.servers
+  servers.reject!{ | server | server.attributes[ :state ] != 'operational' }
+  puts servers.map{ | server | server.attributes[ :nickname ] }.join( "\n" )
+when 'server_arrays'
+  server_arrays = client.server_arrays
+  puts server_arrays.map{ | server_array | server_array.attributes[ :nickname ] }.join( "\n" )
 when nil
   raise 'No action supplied'
 else
